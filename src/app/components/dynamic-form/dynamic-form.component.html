@@ -1,0 +1,46 @@
+<div class="form-field">
+  <!-- TextField -->
+  <mat-form-field appearance="fill" *ngIf="field.type === 'TextField'">
+    <mat-label>{{ field.name }}</mat-label>
+    <input matInput [value]="field.value" />
+  </mat-form-field>
+
+  <!-- TextArea -->
+  <mat-form-field appearance="fill" *ngIf="field.type === 'TextArea'">
+    <mat-label>{{ field.name }}</mat-label>
+    <textarea matInput [value]="field.value"></textarea>
+  </mat-form-field>
+
+  <!-- Checkbox -->
+  <div *ngIf="field.type === 'Checkbox'">
+    <div *ngFor="let option of field.options">
+      <mat-checkbox [checked]="isChecked(option)">
+        {{ option }}
+      </mat-checkbox>
+    </div>
+  </div>
+
+  <!-- Dropdown -->
+  <div *ngIf="field.type === 'Dropdown'">
+    <mat-form-field appearance="fill">
+      <mat-label>{{ field.name }}</mat-label>
+      <mat-select [(ngModel)]="field.value">
+        <mat-option *ngFor="let option of field.options" [value]="option">{{ option }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Radio Button -->
+  <div *ngIf="field.type === 'RadioButton'">
+    <h3>{{ field.name }}</h3>
+    <mat-radio-group [(ngModel)]="field.value">
+      <mat-radio-button *ngFor="let option of field.options" [value]="option">
+        {{ option }}
+      </mat-radio-button>
+    </mat-radio-group>
+  </div>
+
+  <button mat-icon-button color="warn" (click)="removeField()">
+    <img src="assets/delete.svg" alt="Delete" class="delete-icon" />
+  </button>
+</div>

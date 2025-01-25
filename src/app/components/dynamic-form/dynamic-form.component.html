@@ -13,6 +13,7 @@
 
   <!-- Checkbox -->
   <div *ngIf="field.type === 'Checkbox'">
+    <h3>{{ field.name }}</h3>
     <div *ngFor="let option of field.options">
       <mat-checkbox [checked]="isChecked(option)">
         {{ option }}

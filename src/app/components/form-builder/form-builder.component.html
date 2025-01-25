@@ -17,9 +17,34 @@
     <div class="grid-container">
       <!-- Field Label Input -->
       <mat-form-field appearance="fill" class="col-4">
-        <mat-label>Field Label</mat-label>
-        <input matInput [(ngModel)]="fieldName" placeholder="Enter Field Label" required #fieldNameCtrl="ngModel" />
-        <mat-error *ngIf="fieldNameCtrl.invalid && fieldNameCtrl.touched">Field label is required</mat-error>
+        <mat-label>
+          {{
+          selectedFieldType === 'TextField'
+          ? 'Field Label'
+          : selectedFieldType === 'TextArea'
+          ? 'Text Area Label'
+          : selectedFieldType === 'Dropdown'
+          ? 'Dropdown Label'
+          : selectedFieldType === 'Checkbox'
+          ? 'Checkbox Label'
+          : 'Radio Button Label'
+          }}
+        </mat-label>
+        <input matInput [(ngModel)]="fieldName" [placeholder]="getPlaceholder('label')" required
+          [maxlength]="getMaxLength('label')" [pattern]="getPattern('label')" #fieldNameCtrl="ngModel" />
+        <mat-error *ngIf="fieldNameCtrl.invalid && fieldNameCtrl.touched">
+          {{
+          selectedFieldType === 'TextField'
+          ? 'Enter valid text field label'
+          : selectedFieldType === 'TextArea'
+          ? 'Enter valid text area label'
+          : selectedFieldType === 'Dropdown'
+          ? 'Please enter the dropdown label'
+          : selectedFieldType === 'Checkbox'
+          ? 'Please enter the checkbox label'
+          : 'Please enter the radio button label'
+          }}
+        </mat-error>
       </mat-form-field>
     </div>
 
@@ -30,9 +55,26 @@
 
       <div class="grid-container">
         <mat-form-field appearance="fill" class="col-4">
-          <mat-label>Enter Option</mat-label>
-          <input matInput [(ngModel)]="optionInput" placeholder="Option Text" required #optionInputCtrl="ngModel" />
-          <mat-error *ngIf="optionInputCtrl.invalid && optionInputCtrl.touched">Option text is required</mat-error>
+          <mat-label>
+            {{
+            selectedFieldType === 'Dropdown'
+            ? 'Enter Dropdown Options'
+            : selectedFieldType === 'Checkbox'
+            ? 'Enter Checkbox Options'
+            : 'Enter Radio Button Options'
+            }}
+          </mat-label>
+          <input matInput [(ngModel)]="optionInput" [placeholder]="getPlaceholder('options')" required
+            [maxlength]="getMaxLength('options')" #optionInputCtrl="ngModel" />
+          <mat-error *ngIf="optionInputCtrl.invalid && optionInputCtrl.touched">
+            {{
+            selectedFieldType === 'Dropdown'
+            ? 'Please enter dropdown options'
+            : selectedFieldType === 'Checkbox'
+            ? 'Please enter checkbox options'
+            : 'Please enter radio button options'
+            }}
+          </mat-error>
         </mat-form-field>
 
         <button mat-raised-button color="primary" (click)="addOption()" class="col-4">
@@ -66,7 +108,8 @@
 
       <!-- Checkbox Preview -->
       <div *ngIf="selectedFieldType === 'Checkbox'" class="col-4">
-        <div *ngFor="let option of fieldOptions">
+        <h3>{{ fieldName || 'Checkbox Label' }}</h3>
+        <div *ngFor="let option of fieldOptions; let i = index">
           <mat-checkbox [(ngModel)]="checkboxValues[option]" required>{{ option }}</mat-checkbox>
         </div>
       </div>

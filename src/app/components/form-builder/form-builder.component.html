@@ -5,85 +5,71 @@
   <div class="grid-container">
     <mat-form-field appearance="fill" class="col-4">
       <mat-label>Select Field Type</mat-label>
-      <mat-select [(ngModel)]="selectedFieldType" required #selectField="ngModel">
+      <mat-select [(ngModel)]="selectedFieldType" required>
         <mat-option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</mat-option>
       </mat-select>
-      <mat-error *ngIf="selectField.invalid && selectField.touched">Field type is required</mat-error>
+      <mat-error *ngIf="!selectedFieldType">Field type is required</mat-error>
     </mat-form-field>
   </div>
 
-  <!-- Show selected field type for customization -->
-  <div *ngIf="selectedFieldType">
+  <!-- Field Customization Section -->
+  <div *ngIf="selectedFieldType" class="field-customization">
+    <h3>Customize Field</h3>
     <div class="grid-container">
-      <!-- Field Label Input -->
-      <mat-form-field appearance="fill" class="col-4">
-        <mat-label>
-          {{
-          selectedFieldType === 'TextField'
-          ? 'Field Label'
-          : selectedFieldType === 'TextArea'
-          ? 'Text Area Label'
-          : selectedFieldType === 'Dropdown'
-          ? 'Dropdown Label'
-          : selectedFieldType === 'Checkbox'
-          ? 'Checkbox Label'
-          : 'Radio Button Label'
-          }}
-        </mat-label>
-        <input matInput [(ngModel)]="fieldName" [placeholder]="getPlaceholder('label')" required
-          [maxlength]="getMaxLength('label')" [pattern]="getPattern('label')" #fieldNameCtrl="ngModel" />
-        <mat-error *ngIf="fieldNameCtrl.invalid && fieldNameCtrl.touched">
-          {{
-          selectedFieldType === 'TextField'
-          ? 'Enter valid text field label'
-          : selectedFieldType === 'TextArea'
-          ? 'Enter valid text area label'
-          : selectedFieldType === 'Dropdown'
-          ? 'Please enter the dropdown label'
-          : selectedFieldType === 'Checkbox'
-          ? 'Please enter the checkbox label'
-          : 'Please enter the radio button label'
-          }}
+      <!-- Field Label -->
+      <mat-checkbox [(ngModel)]="fieldLabelEnabled">Field Label</mat-checkbox>
+      <mat-form-field appearance="fill" class="col-4" *ngIf="fieldLabelEnabled">
+        <mat-label>Field Label</mat-label>
+        <input matInput [(ngModel)]="fieldName" placeholder="Enter field label" required #fieldLabelCtrl="ngModel" />
+        <mat-error *ngIf="fieldLabelEnabled && !fieldLabelCtrl.value">
+          Field label is required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Placeholder -->
+      <mat-checkbox [(ngModel)]="placeholderEnabled">Placeholder</mat-checkbox>
+      <mat-form-field appearance="fill" class="col-4" *ngIf="placeholderEnabled">
+        <mat-label>Placeholder</mat-label>
+        <input matInput [(ngModel)]="placeholder" placeholder="Enter placeholder text" required
+          #placeholderCtrl="ngModel" />
+        <mat-error *ngIf="placeholderEnabled && !placeholderCtrl.value">
+          Placeholder is required
+        </mat-error>
+      </mat-form-field>
+
+      <h3>Customize Validation</h3>
+      <mat-checkbox [(ngModel)]="maxLengthEnabled">Max Length</mat-checkbox> &nbsp;
+      <mat-form-field appearance="fill" class="col-4" *ngIf="maxLengthEnabled">
+        <mat-label>Max Length</mat-label>
+        <input matInput [(ngModel)]="maxLength" type="number" placeholder="Enter max length of character" required
+          #maxLengthCtrl="ngModel" />
+        <mat-error *ngIf="maxLengthEnabled && !maxLengthCtrl.value">
+          Max length is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-checkbox [(ngModel)]="patternEnabled">Validation Pattern</mat-checkbox>
+      <mat-form-field appearance="fill" class="col-4" *ngIf="patternEnabled">
+        <mat-label>Validation Pattern</mat-label>
+        <input matInput [(ngModel)]="pattern" placeholder="Enter regex pattern" required #patternCtrl="ngModel" />
+        <mat-error *ngIf="patternEnabled && !patternCtrl.value">
+          Validation pattern is required
         </mat-error>
       </mat-form-field>
     </div>
 
-    <!-- Options for Dropdown/RadioButton/Checkbox -->
+    <!-- Field Options Section -->
     <div
-      *ngIf="selectedFieldType === 'Dropdown' || selectedFieldType === 'RadioButton' || selectedFieldType === 'Checkbox'">
+      *ngIf="selectedFieldType === 'Dropdown' || selectedFieldType === 'Checkbox' || selectedFieldType === 'RadioButton'">
       <h3>Options</h3>
-
       <div class="grid-container">
         <mat-form-field appearance="fill" class="col-4">
-          <mat-label>
-            {{
-            selectedFieldType === 'Dropdown'
-            ? 'Enter Dropdown Options'
-            : selectedFieldType === 'Checkbox'
-            ? 'Enter Checkbox Options'
-            : 'Enter Radio Button Options'
-            }}
-          </mat-label>
-          <input matInput [(ngModel)]="optionInput" [placeholder]="getPlaceholder('options')" required
-            [maxlength]="getMaxLength('options')" #optionInputCtrl="ngModel" />
-          <mat-error *ngIf="optionInputCtrl.invalid && optionInputCtrl.touched">
-            {{
-            selectedFieldType === 'Dropdown'
-            ? 'Please enter dropdown options'
-            : selectedFieldType === 'Checkbox'
-            ? 'Please enter checkbox options'
-            : 'Please enter radio button options'
-            }}
-          </mat-error>
+          <mat-label>Option</mat-label>
+          <input matInput [(ngModel)]="optionInput" placeholder="Enter option text" />
         </mat-form-field>
-
-        <button mat-raised-button color="primary" (click)="addOption()" class="col-4">
-          Add Option
-        </button>
+        <button mat-raised-button color="primary" (click)="addOption()">Add Option</button>
       </div>
-
-      <!-- Display added options -->
-      <div *ngFor="let option of fieldOptions; let i = index">
+      <div *ngFor="let option of fieldOptions; let i = index" class="option-list">
         {{ option }}
         <button mat-icon-button color="warn" (click)="removeOption(i)">
           <img src="assets/delete.svg" alt="Delete" class="delete-icon" />
@@ -91,69 +77,20 @@
       </div>
     </div>
 
-    <!-- Field Preview -->
-    <h3 *ngIf="formSaved">Select Option</h3>
-    <div *ngIf="formSaved" class="grid-container">
-      <mat-form-field appearance="fill" *ngIf="selectedFieldType === 'TextField'" class="col-4">
-        <mat-label>{{ fieldName || 'Text Field' }}</mat-label>
-        <input matInput [(ngModel)]="fieldValue" required #fieldValueCtrl="ngModel" />
-        <mat-error *ngIf="fieldValueCtrl.invalid && fieldValueCtrl.touched">This field is required</mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="fill" *ngIf="selectedFieldType === 'TextArea'" class="col-4">
-        <mat-label>{{ fieldName || 'Text Area' }}</mat-label>
-        <textarea matInput [(ngModel)]="fieldValue" required #fieldValueCtrl="ngModel"></textarea>
-        <mat-error *ngIf="fieldValueCtrl.invalid && fieldValueCtrl.touched">This field is required</mat-error>
-      </mat-form-field>
-
-      <!-- Checkbox Preview -->
-      <div *ngIf="selectedFieldType === 'Checkbox'" class="col-4">
-        <h3>{{ fieldName || 'Checkbox Label' }}</h3>
-        <div *ngFor="let option of fieldOptions; let i = index">
-          <mat-checkbox [(ngModel)]="checkboxValues[option]" required>{{ option }}</mat-checkbox>
-        </div>
-      </div>
-
-      <!-- Dropdown Preview -->
-      <div *ngIf="selectedFieldType === 'Dropdown'" class="col-4">
-        <mat-form-field appearance="fill">
-          <mat-label>{{ fieldName || 'Dropdown' }}</mat-label>
-          <mat-select [(ngModel)]="fieldValue" required #dropdownCtrl="ngModel">
-            <mat-option *ngFor="let option of fieldOptions" [value]="option">{{ option }}</mat-option>
-          </mat-select>
-          <mat-error *ngIf="dropdownCtrl.invalid && dropdownCtrl.touched">This field is required</mat-error>
-        </mat-form-field>
-      </div>
-
-      <!-- Radio Button Preview -->
-      <div *ngIf="selectedFieldType === 'RadioButton'" class="col-4">
-        <mat-radio-group [(ngModel)]="fieldValue" required #radioGroupCtrl="ngModel">
-          <mat-radio-button *ngFor="let option of fieldOptions" [value]="option">
-            {{ option }}
-          </mat-radio-button>
-        </mat-radio-group>
-        <mat-error *ngIf="radioGroupCtrl.invalid && radioGroupCtrl.touched">This field is required</mat-error>
-      </div>
-    </div>
-
-    <!-- Save Button -->
+    <!-- Save Field Button -->
     <div class="grid-container">
-      <button mat-raised-button color="accent" (click)="saveField()" class="col-4">
-        Save Field
-      </button>
+      <button mat-raised-button color="primary" (click)="saveField()">Save Field</button>
     </div>
   </div>
 
-  <!-- Form Preview -->
-  <div *ngIf="formSaved">
-    <h3>Form Preview</h3>
-    <div *ngFor="let field of formDataService.formFields; let i = index">
-      <app-dynamic-form [field]="field" (remove)="formDataService.removeField(i)"></app-dynamic-form>
+  <!-- Saved Fields Preview -->
+  <div *ngIf="formFields.length > 0">
+    <h3>Saved Fields</h3>
+    <div *ngFor="let field of formFields; let i = index" class="saved-field">
+      <app-dynamic-form [field]="field" (remove)="removeField(i)"></app-dynamic-form>
     </div>
 
-    <!-- Save Form Data Button -->
-    <button mat-raised-button color="primary" (click)="saveFormData()" class="col-4">
-      Save Form Data
-    </button>
+    <!-- Submit Form Button -->
+    <button mat-raised-button color="accent" (click)="submitForm()">Submit Form</button>
   </div>
 </div>

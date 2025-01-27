@@ -1,4 +1,4 @@
-import { Component, Input, EventEmitter, Output } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormField } from '../../services/form-field.model';
 
 @Component({
@@ -9,17 +9,20 @@ import { FormField } from '../../services/form-field.model';
 export class DynamicFormComponent {
   @Input() field!: FormField;
   @Output() remove = new EventEmitter<void>();
+  @Output() update = new EventEmitter<{ name: string; value: any }>();
 
-  isChecked(option: string): boolean {
-    if (Array.isArray(this.field.value)) {
-      return this.field.value.includes(option);
-    }
+  // Getter for pattern validation
+  get isPatternValid(): boolean {
+    return this.field.pattern ? new RegExp(this.field.pattern).test(this.field.value) : true;
+  }
 
-    if (typeof this.field.value === 'boolean') {
-      return this.field.value === true;
-    }
+  // Getter for max length validation
+  get isMaxLengthValid(): boolean {
+    return this.field.maxLength ? this.field.value?.length <= this.field.maxLength : true;
+  }
 
-    return this.field.value === option;
+  onFieldChange() {
+    this.update.emit({ name: this.field.name, value: this.field.value });
   }
 
   removeField() {

@@ -8,8 +8,25 @@ export class FormDataService {
   formFields: FormField[] = [];
 
   // Add field to form
-  addField(type: string, name: string, options: string[] | undefined, value: string | string[]) {
-    this.formFields.push({ type, name, options, value });
+  addField(type: string,
+    name: string,
+    options: string[] | undefined,
+    value: string | string[],
+    placeholder: string = '',
+    required: boolean = false) {
+    const fieldOptions = options || [];
+
+    const newField: FormField = {
+      type,
+      name,
+      options: fieldOptions,
+      value,
+      placeholder,
+      required,
+      errorMessage: ''
+    };
+
+    this.formFields.push(newField);
   }
 
   // Remove field from form

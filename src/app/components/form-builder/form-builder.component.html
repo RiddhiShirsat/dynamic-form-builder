@@ -85,9 +85,12 @@
 
   <!-- Saved Fields Preview -->
   <div *ngIf="formFields.length > 0">
-    <h3>Saved Fields</h3>
+    <h3>Form Preview</h3>
     <div *ngFor="let field of formFields; let i = index" class="saved-field">
       <app-dynamic-form [field]="field" (remove)="removeField(i)"></app-dynamic-form>
+       <mat-error *ngIf="field.required && (isFieldEmpty(field))">
+        {{ field.name }} is required.
+      </mat-error>
     </div>
 
     <!-- Submit Form Button -->

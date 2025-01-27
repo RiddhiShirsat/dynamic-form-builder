@@ -84,9 +84,9 @@ export class FormBuilderComponent {
 
     const newField: FormField = {
       type: this.selectedFieldType,
-      name: this.fieldLabelEnabled ? this.fieldName.trim() : '',
-      placeholder: this.placeholderEnabled ? this.placeholder.trim() : '',
-      required: this.isRequired,
+      name: this.fieldName.trim(),
+      placeholder: this.placeholder.trim(),
+      required: true,
       maxLength: this.maxLengthEnabled ? this.maxLength : undefined,
       pattern: this.patternEnabled ? this.pattern : undefined,
       options: [...this.fieldOptions],
@@ -94,12 +94,12 @@ export class FormBuilderComponent {
     };
 
     this.formFields.push(newField);
-    this.resetForm();
 
     this.snackBar.open('Field saved successfully!', 'Close', {
       duration: 3000,
       verticalPosition: 'top',
     });
+    this.resetForm();
   }
 
   // Remove a saved field
@@ -111,10 +111,33 @@ export class FormBuilderComponent {
     });
   }
 
+  isFieldEmpty(field: FormField): boolean {
+    switch (field.type) {
+      case 'TextField':
+      case 'TextArea':
+      case 'Dropdown':
+      case 'RadioButton':
+        return !field.value || (typeof field.value === 'string' && field.value.trim() === '');
+      case 'Checkbox':
+        // Check if at least one checkbox is selected
+        return (
+          !field.value ||
+          typeof field.value !== 'object' ||
+          !Object.values(field.value).some((checked) => checked)
+        );
+      default:
+        // Default to false (valid) for unsupported field types
+        return false;
+    }
+  }
+
   // Submit the entire form
   submitForm() {
-    if (!this.formFields.length) {
-      this.snackBar.open('No fields to submit!', 'Close', {
+    const invalidFields = this.formFields.filter(field => field.required && this.isFieldEmpty(field));
+
+    if (invalidFields.length > 0) {
+
+      this.snackBar.open('Please fill all required fields.', 'Close', {
         duration: 3000,
         verticalPosition: 'top',
       });
